@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Async/Await Fetch Example</h1>
+    <button type="button" onclick="loadData()">Load Data</button>
+    <p id="data"></p>
+
+    <script>
+        //According to the technical specifications,
+        //this task required using jquery (implementing a regular fetch with it),
+        //but I will still try to avoid such perversions
+
+        async function loadData() {
+            try {
+                const response = await fetch('http://localhost:3000/api/name');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.text();
+                document.getElementById('data').innerHTML = data;
+            } catch (error) {
+                console.log('There was a problem with the fetch operation: ' + error.message);
+            }
+        }
+    </script>
+</body>
+
+</html>

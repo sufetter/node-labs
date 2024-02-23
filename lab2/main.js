@@ -29,7 +29,7 @@ handlers.set("/api/name", (_, res) => {
 });
 handlers.set("/xmlhttprequest", serveFile("xmlhttprequest.html"));
 handlers.set("/fetch", serveFile("fetch.html"));
-handlers.set("/async_fetch", serveFile("async_fetch.html"));
+handlers.set("/safe_fetch", serveFile("safe_fetch.html"));
 
 const server = http.createServer((req, res) => {
   if (handlers.has(req.url)) {

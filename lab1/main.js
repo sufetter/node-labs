@@ -2,7 +2,7 @@ import http from "http";
 
 const handlers = new Map();
 
-handlers.set("/task2", (req, res) => {
+handlers.set("/task2", (_, res) => {
   res.writeHead(200, {"Content-Type": "text/html"});
   res.end("<h1>Hello World</h1>");
 });

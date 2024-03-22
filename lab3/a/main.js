@@ -34,7 +34,8 @@ const handlers = new Map();
 
 const serveFile =
   (filename, contentType = "text/html", directory = "./") =>
-  (_, res) => {
+  (req, res) => {
+    const queryObject = url.parse(req.url, true).query;
     fs.readFile(
       path.join(__dirname, directory, filename),
       "utf-8",
@@ -43,7 +44,10 @@ const serveFile =
           res.writeHead(500);
           res.end(`Error: ${err.message}`);
         } else {
-          const rendered = ejs.render(data, {state: serverState});
+          const rendered = ejs.render(data, {
+            state: serverState,
+            k: queryObject.k,
+          });
           res.writeHead(200, {"Content-Type": contentType});
           res.end(rendered);
         }
@@ -56,6 +60,49 @@ const factorial = (n) => {
 };
 
 handlers.set("/state", serveFile("state.html"));
+
+const asyncFactorial = (n, callback) => {
+  setImmediate(() => {
+    let result = 1;
+    for (let i = 2; i <= n; i++) {
+      result *= i;
+    }
+    callback(result);
+  });
+};
+
+handlers.set("/fact-async", (req, res) => {
+  const queryObject = url.parse(req.url, true).query;
+  if (queryObject.k) {
+    const k = Number(queryObject.k);
+    asyncFactorial(k, (fact) => {
+      res.writeHead(200, {"Content-Type": "application/json"});
+      res.end(JSON.stringify({k, fact}));
+    });
+  } else {
+    res.writeHead(400, {"Content-Type": "text/plain"});
+    res.end("Invalid request");
+  }
+});
+
+handlers.set("/factNT-HTML", serveFile("factNextTick.html"));
+
+handlers.set("/factNT", (req, res) => {
+  const queryObject = url.parse(req.url, true).query;
+  if (queryObject.k) {
+    const k = Number(queryObject.k);
+    const start = Date.now();
+    process.nextTick(() => {
+      const fact = factorial(k);
+      const t = Date.now() - start;
+      res.writeHead(200, {"Content-Type": "application/json"});
+      res.end(JSON.stringify({t, k, fact}));
+    });
+  } else {
+    res.writeHead(400, {"Content-Type": "text/plain"});
+    res.end("Invalid request");
+  }
+});
 
 handlers.set("/fact", (req, res) => {
   const queryObject = url.parse(req.url, true).query;

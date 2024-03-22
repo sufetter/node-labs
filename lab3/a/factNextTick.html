@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factorial Results</title>
+</head>
+
+<body>
+    <h1>Factorial Results</h1>
+    <div id="results"></div>
+    <script>
+        async function fetchFactorialResults() {
+            const resultsDiv = document.getElementById('results');
+            let results = [];
+            const startTime = Date.now();
+            for (let x = 1; x <= 20; x++) {
+                const response = await fetch(`http://localhost:3000/factNextTick?k=${x}`);
+                const data = await response.json();
+                const elapsedTime = Date.now() - startTime;
+                results.push({
+                    t: elapsedTime,
+                    k: data.k,
+                    fact: data.fact
+                });
+            }
+            results.sort((a, b) => a.fact - b.fact);
+            results.forEach(result => {
+                const p = document.createElement('p');
+                p.textContent = `t-${result.t}/${result.k}/fact: ${result.fact}`;
+                resultsDiv.appendChild(p);
+            });
+        }
+        fetchFactorialResults();
+    </script>
+</body>
+
+</html>
